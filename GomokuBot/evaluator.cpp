@@ -70,6 +70,7 @@ Evaluator::Evaluator(Board board)
 
 Move Evaluator::findBestMove()
 {
+    // search for next good move for AI
     int bestVal = -1000;
     Move bestMove;
     bestMove.setI(-1);
@@ -96,17 +97,25 @@ Move Evaluator::findBestMove()
 int Evaluator::maxing(int depth, bool isMaxing, int alpha, int beta)
 {
     int bestVal = -1000;
+    
+    // Moves to consider to take in this game state
     std::vector<Move> moveArray = _Board.getPossibleMoves();
+    
     
     for (Move m: moveArray)
     {
         if ((_Board.value(m.getI(), m.getJ())) == '_')
             {
+                // Make a move at m.i & m.j
                 _Board.makemove(m.getI(), m.getJ(), 1);
-                //printBoard();
+                
                 bestVal = std::max(bestVal,minimax(depth+1, false, alpha, beta));
                 alpha = std::max(alpha, bestVal);
+                
+                // Remove that move
                 _Board.makemove(m.getI(), m.getJ(), 0);
+                
+                // alpha beta pruning
                 if (beta <= alpha)
                 {
                     break;
@@ -120,17 +129,23 @@ int Evaluator::minizing(int depth, bool isMaxing, int alpha, int beta)
 {
     int bestVal = 1000;
     
+    // Moves to consider to take in this game state
     std::vector<Move> moveArray = _Board.getPossibleMoves();
     
     for (Move m : moveArray)
     {
         if (_Board.value(m.getI(), m.getJ()) == '_')
         {
+            // Make a move at m.i & m.j
             _Board.makemove(m.getI(), m.getJ(), 2);
-            //printBoard();
+
             bestVal = std::min(bestVal,minimax(depth+1, true, alpha, beta));
             beta = std::min(beta,bestVal);
+            
+            // Remove the move
             _Board.makemove(m.getI(), m.getJ(), 0);
+            
+            // Alpha beta pruning
             if (beta <= alpha)
             {
                 break;
@@ -152,6 +167,8 @@ bool equals3(char a,char b,char c) {
 
 int Evaluator::checkwinner() const
 {
+
+   // Win conditions for tic tac toe (3x3)
 
   // horizontal
   for (int i = 0; i < 3; i++) {
@@ -182,14 +199,16 @@ int Evaluator::checkwinner() const
 }
 int Evaluator::minimax(int depth, bool isMaxing, int alpha, int beta)
 {
+    
+    // get this game state score
     int score = checkwinner();
-//    std::cout << score << std::endl;
+    
     // if maximizer of minimizer win the game
     if (score == 10 || score == -10)
         return score;
+    
     // return 0 if there is no move left
     if (!_Board.isMoveLeft() || depth == 5) return 0;
-    
     
     if (isMaxing)
     {

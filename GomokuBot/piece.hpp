@@ -12,6 +12,8 @@
 #include <stdio.h>
 
 #include "move.hpp"
+
+// Struct to describe moves played in the game
 class Piece
 {
 private:

@@ -24,32 +24,40 @@ Board::Board()
         _Board[i] = new char[m];
     init();
 }
+
 int Board::getn() const
 {
     return n;
 }
+
 int Board::getm() const
 {
     return m;
 }
+
 char** Board::getBoard() const
 {
     return _Board;
 }
+
 char Board::value(int i, int j) const
 {
     return _Board[i][j];
 }
+
 char Board::getplayer() const
 {
     return player;
 }
+
 char Board::getAI() const
 {
     return AI;
 }
+
 void Board::init()
 {
+    // Initialize board with empty
     for (int i = 0; i < n; i++)
         for (int j = 0; j < m; j++)
             _Board[i][j] = '_';
@@ -58,6 +66,7 @@ void Board::init()
 
 void Board::makemove(int i, int j, int color)
 {
+    // Make a move on game board
     char c = ' ';
     switch (color)
     {
@@ -66,8 +75,8 @@ void Board::makemove(int i, int j, int color)
         case 2: c = 'X'; break;
     }
     _Board[i][j] = c;
-//    Move m(i,j);
-//    Piece p(m, c);
+    
+    // Storing moves played in the game
     Piece p(Move(i,j), c);
     move.push_back(p);
 }
@@ -93,6 +102,8 @@ int Board::getHash(const int moduloR = 1000000007) const
     // find first existing position
     int min_i = INT_MAX, min_j = INT_MAX,
         max_i = INT_MIN, max_j = INT_MIN;
+    
+    //
     for (int i = 0; i < n; i++)
         for (int j = 0; j < m; j++)
             if (_Board[i][j] != 0)
@@ -183,7 +194,7 @@ int Board::win() const
 
 bool Board::inBoard(int x, int y) const
 {
-    return (x >= 0 && x <= n && y >= 0 && y <= m);
+    return (x >= 0 && x < n && y >= 0 && y < m);
 }
 
 bool Board::isMoveLeft() const
@@ -196,6 +207,7 @@ bool Board::isMoveLeft() const
 
 std::vector<Move> Board::getPossibleMoves() const
 {
+    
     bool yes[n][m];
     std::vector<Move> res;
     
@@ -204,7 +216,7 @@ std::vector<Move> Board::getPossibleMoves() const
         for (int j = 0; j < m; j++)
             yes[i][j] = false;
     
-    
+    // Generate moves based on moves played in game
     for (Piece p : this->move)
     {
         int x = p.getpos().getI();

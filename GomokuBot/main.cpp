@@ -12,16 +12,17 @@
 #define column 3
 using namespace std;
 int main() {
-    // insert code here...
+
+    // Storing the game
     Board _board;
     
-    _board.printBoard();
     int win=false;
     int i,j;
+    
     while (win==false)
     {
-    //asking user X for coordinates
-       
+    
+        //asking user X for coordinates
         rx :
         
         cout <<"\nEnter the coordinates where you want to Enter X : ";
@@ -37,14 +38,22 @@ int main() {
             goto rx;
         }
         
+        // Showing player move
         _board.printBoard();
-        win = _board.win();   //checking win
+        
+        //checking win
+        win = _board.win();
         if(win == -10)
         {
             cout<<"Player with X char won!!";
             break;
         }
+        
         cout << endl;
+        
+        
+        // Evaluator to find next good move
+        
         Evaluator e(_board);
         
 //        vector<Piece> p = e.getMoveList();
@@ -60,17 +69,27 @@ int main() {
 //            cout << mo.getI() << " " << mo.getJ() << endl;
 //        }
 //
-        Move bestMove = e.findBestMove();
-        _board.makemove(bestMove.getI(), bestMove.getJ(), 1);
         
-        _board.printBoard();
-
-        if (win == 10)
+        // If there is any empty move to go
+        if (_board.isMoveLeft())
         {
-            cout << "Player with O char won!!";
-            break;
+            // find a good move to go
+            Move bestMove = e.findBestMove();
             
+            // make the move on the game board
+            _board.makemove(bestMove.getI(), bestMove.getJ(), 1);
+            
+            // print game after AI's move
+            _board.printBoard();
+            
+            if (win == 10)
+            {
+                cout << "Player with O char won!!";
+                break;
+                
+            }
         }
+        else cout << "DRAW";
     }
     return 0;
 }
