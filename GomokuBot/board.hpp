@@ -36,6 +36,7 @@
 //
 //};
 
+#include "hashTable.hpp"
 
 class Board
 {
@@ -43,6 +44,7 @@ protected:
     int n,m;
     char** _Board;
     std::vector<Piece> move;
+    //HashTable currentState;
 //    Player currentPlayer;
     char player = 'X';
     char AI = 'O';
@@ -66,6 +68,7 @@ public:
     bool inBoard(int x, int y) const;
     std::vector<Move> getPossibleMoves() const;
     std::vector<Piece> getMoveList() const;
+    int** getBoardInt() const;
     
     
 };

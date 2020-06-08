@@ -9,63 +9,23 @@
 #include "evaluator.hpp"
 #include "string"
 #include "iostream"
-//void increase(std::string& pattern)
-//{
-//    int n = 0;
-//    int carry = 0;
-//    for (int i = (int) pattern.size() - 1; i >= 0; i--)
-//    {
-//        int tmp = pattern[i] - '0';
-//        tmp += 1 + carry;
-//        carry = 0;
-//        if (tmp>2) {
-//            carry = 1;
-//            tmp = 0;
-//        }
-//        n = n * 10 + tmp;
-//        
-//    }
-//    if (carry == 1) n = n * 10 + carry;
-//    
-//    pattern = std::to_string(n);
-//    reverse(pattern.begin(), pattern.end());
-//}
-//
-//int give_score(std::string pattern)
-//{
-//    int count = 0;
-//    int maxScore = INT_MIN;
-//    for (int i = 0; i < pattern.size(); i++)
-//    {
-//        // check so dau O lien tiep
-//        if (pattern[i] == '1')
-//        {
-//            count++;
-//            if (count == 1) maxScore = std::max(maxScore, 5);
-//            if (count == 2) maxScore = std::max(maxScore, 10);
-//            if (count == 3) maxScore = std::max(maxScore, 20);
-//            if (count == 4) maxScore = std::max(maxScore, 50);
-//            if (count >= 5) maxScore = std::max(maxScore, 1000);
-//        }
-//        else count = 0;
-//    }
-//    return maxScore;
-//}
+#include "algorithm"
+#include "chrono"
 
-Evaluator::Evaluator(Board board)
+Evaluator::Evaluator()
 {
-    
-    //Get board value
+    cnt = 0;
+    currentHash = 0;
+}
+
+void Evaluator::updateBoard(Board board)
+{
     _Board = board;
-    // Initialize pattern score
-//    string pattern = "0";
-//    while (pattern <= "222222222")
-//    {
-//        int score = give_score(pattern);
-//        int pattern_int = stoi(pattern);
-//        pattern_score.insert(std::pair<int, int>(pattern_int ,score));
-//        increase(pattern);
-//    }
+}
+
+void Evaluator::updateStartTime(time_t time)
+{
+    t_start = time;
 }
 
 Move Evaluator::findBestMove()
@@ -75,25 +35,79 @@ Move Evaluator::findBestMove()
     Move bestMove;
     bestMove.setI(-1);
     bestMove.setJ(-1);
-    for (int i = 0; i < _Board.getn(); i++)
-        for (int j = 0; j < _Board.getm(); j++)
+    
+    std::vector<Move> moveArray = _Board.getPossibleMoves();
+    
+    for (Move m : moveArray)
+    {
+        if (_Board.empty(m.getI(), m.getJ()))
         {
-            if (_Board.empty(i, j))
+            // Make move at i j
+            _Board.makemove(m.getI(), m.getJ(), 1);
+            
+            // Find value of this move
+            int moveVal = minimax(0, false, -1000, 1000);
+            //std::cout << moveVal << std::endl;
+            
+            // Remove move
+            _Board.makemove(m.getI(), m.getJ(), 0);
+            
+            //Update bestVal & bestMove
+            if (moveVal > bestVal)
             {
-                _Board.makemove(i, j, 1);
-                int moveVal = minimax(0, false, -1000, 1000);
-                //std::cout << moveVal << std::endl;
-                _Board.makemove(i, j, 0);
-                if (moveVal > bestVal)
-                {
-                    bestMove.setI(i);
-                    bestMove.setJ(j);
-                    bestVal = moveVal;
-                }
+                bestMove.setI(m.getI());
+                bestMove.setJ(m.getJ());
+                bestVal = moveVal;
             }
         }
+    }
+    
     return bestMove;
 }
+int Evaluator::evaluateStateScore(int AI, int human) const
+{
+    if (_Board.getplayer() == 'X')
+        human*=2;
+    else AI*=2;
+    return (AI-human);
+}
+
+bool Evaluator::isCutOff(int depth, int AI, int human) const
+{
+    time_t end;
+    time(&end);
+    
+    if ((double) (end-t_start) >= 5)
+        return true;
+    
+    if (depth == 2)
+        return true;
+    if (!_Board.isMoveLeft())
+        return true;
+    if (AI >= 1000 || human >= 1000)
+            return true;
+    return false;
+}
+
+int Evaluator::minimax(int depth, bool isMaxing, int alpha, int beta)
+{
+
+    int AI = GiveScore(_Board, 1).GiveTotalScore();
+    int human = GiveScore(_Board, 2).GiveTotalScore();
+
+    //std::cout << AI << " " << human << " " << std::endl;
+    
+    if (isCutOff(depth, AI, human))
+        return evaluateStateScore(AI, human);
+    
+    if (isMaxing)
+        return maxing(depth, isMaxing, alpha, beta);
+    else
+        return minizing(depth, isMaxing, alpha, beta);
+    
+}
+
+
 int Evaluator::maxing(int depth, bool isMaxing, int alpha, int beta)
 {
     int bestVal = -1000;
@@ -101,9 +115,9 @@ int Evaluator::maxing(int depth, bool isMaxing, int alpha, int beta)
     // Moves to consider to take in this game state
     std::vector<Move> moveArray = _Board.getPossibleMoves();
     
-    
-    for (Move m: moveArray)
+    for (Move m : moveArray)
     {
+        cnt++;
         if ((_Board.value(m.getI(), m.getJ())) == '_')
             {
                 // Make a move at m.i & m.j
@@ -117,9 +131,7 @@ int Evaluator::maxing(int depth, bool isMaxing, int alpha, int beta)
                 
                 // alpha beta pruning
                 if (beta <= alpha)
-                {
-                    break;
-                }
+                    return bestVal;
             }
     }
     return bestVal;
@@ -131,9 +143,10 @@ int Evaluator::minizing(int depth, bool isMaxing, int alpha, int beta)
     
     // Moves to consider to take in this game state
     std::vector<Move> moveArray = _Board.getPossibleMoves();
-    
+
     for (Move m : moveArray)
     {
+        cnt++;
         if (_Board.value(m.getI(), m.getJ()) == '_')
         {
             // Make a move at m.i & m.j
@@ -147,23 +160,19 @@ int Evaluator::minizing(int depth, bool isMaxing, int alpha, int beta)
             
             // Alpha beta pruning
             if (beta <= alpha)
-            {
-                break;
-            }
+                return bestVal;
         }
     }
     return bestVal;
 
 }
 
+
 bool equals3(char a,char b,char c) {
   return a == b && b == c && a != '_';
 }
 
-//int Evaluator::evaluateScore() const
-//{
-//
-//}
+// Checker for 3x3 board
 
 int Evaluator::checkwinner() const
 {
@@ -197,29 +206,9 @@ int Evaluator::checkwinner() const
   }
     return 0;
 }
-int Evaluator::minimax(int depth, bool isMaxing, int alpha, int beta)
-{
-    
-    // get this game state score
-    int score = checkwinner();
-    
-    // if maximizer of minimizer win the game
-    if (score == 10 || score == -10)
-        return score;
-    
-    // return 0 if there is no move left
-    if (!_Board.isMoveLeft() || depth == 5) return 0;
-    
-    if (isMaxing)
-    {
-        return maxing(depth, isMaxing, alpha, beta);
-    }
-    else
-    {
-        return minizing(depth, isMaxing, alpha, beta);
-    }
-    
-}
+
+
+
 
 std::vector<Piece> Evaluator::getMoveList() const
 {

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B62D87ED24894A14002E7224 /* giveScore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B62D87EB24894A14002E7224 /* giveScore.cpp */; };
+		B6319766248E7ABF0048C895 /* hashTable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6319764248E7ABF0048C895 /* hashTable.cpp */; };
 		B6355B4C2487E506006C73D1 /* evaluator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6355B4A2487E506006C73D1 /* evaluator.cpp */; };
 		B6355B4F2487F8AF006C73D1 /* move.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6355B4D2487F8AF006C73D1 /* move.cpp */; };
 		B6355B522487FAFA006C73D1 /* piece.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6355B502487FAFA006C73D1 /* piece.cpp */; };
@@ -27,6 +29,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		B62D87EB24894A14002E7224 /* giveScore.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = giveScore.cpp; sourceTree = "<group>"; };
+		B62D87EC24894A14002E7224 /* giveScore.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = giveScore.hpp; sourceTree = "<group>"; };
+		B6319764248E7ABF0048C895 /* hashTable.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = hashTable.cpp; sourceTree = "<group>"; };
+		B6319765248E7ABF0048C895 /* hashTable.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = hashTable.hpp; sourceTree = "<group>"; };
 		B6355B4A2487E506006C73D1 /* evaluator.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = evaluator.cpp; sourceTree = "<group>"; };
 		B6355B4B2487E506006C73D1 /* evaluator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = evaluator.hpp; sourceTree = "<group>"; };
 		B6355B4D2487F8AF006C73D1 /* move.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = move.cpp; sourceTree = "<group>"; };
@@ -78,6 +84,10 @@
 				B6355B4E2487F8AF006C73D1 /* move.hpp */,
 				B6355B502487FAFA006C73D1 /* piece.cpp */,
 				B6355B512487FAFA006C73D1 /* piece.hpp */,
+				B62D87EB24894A14002E7224 /* giveScore.cpp */,
+				B62D87EC24894A14002E7224 /* giveScore.hpp */,
+				B6319764248E7ABF0048C895 /* hashTable.cpp */,
+				B6319765248E7ABF0048C895 /* hashTable.hpp */,
 			);
 			path = GomokuBot;
 			sourceTree = "<group>";
@@ -142,6 +152,8 @@
 				B6355B522487FAFA006C73D1 /* piece.cpp in Sources */,
 				B63A5500248507EE00856B4B /* board.cpp in Sources */,
 				B63A54F82485070F00856B4B /* main.cpp in Sources */,
+				B62D87ED24894A14002E7224 /* giveScore.cpp in Sources */,
+				B6319766248E7ABF0048C895 /* hashTable.cpp in Sources */,
 				B6355B4F2487F8AF006C73D1 /* move.cpp in Sources */,
 				B6355B4C2487E506006C73D1 /* evaluator.cpp in Sources */,
 			);

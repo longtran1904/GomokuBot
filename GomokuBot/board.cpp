@@ -17,8 +17,8 @@
 using namespace std;
 Board::Board()
 {
-    n = 3;
-    m = 3;
+    n = 10;
+    m = 10;
     _Board = new char*[n];
     for (int i = 0; i < n; i++)
         _Board[i] = new char[m];
@@ -35,10 +35,6 @@ int Board::getm() const
     return m;
 }
 
-char** Board::getBoard() const
-{
-    return _Board;
-}
 
 char Board::value(int i, int j) const
 {
@@ -88,6 +84,7 @@ void Board::printBoard() const
             cout << _Board[i][j];
         cout << endl;
     }
+    cout << endl;
 }
 int powerOf3(int exp, int moduloR)
 {
@@ -244,4 +241,27 @@ std::vector<Move> Board::getPossibleMoves() const
 std::vector<Piece> Board::getMoveList() const
 {
     return move;
+}
+
+int** Board::getBoardInt() const
+{
+    
+    // Initialize array of int
+    int** res;
+    res = new int*[n];
+    for (int i = 0; i < n; i++)
+        res[i] = new int[m];
+    
+    // transfer board from char to int
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++)
+        {
+            if (_Board[i][j] == AI)
+                res[i][j] = 1;
+            else
+                if (_Board[i][j] == player)
+                    res[i][j] = 2;
+                else res[i][j] = 0;
+        }
+    return res;
 }
