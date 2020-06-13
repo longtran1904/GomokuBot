@@ -35,7 +35,7 @@ int main() {
         //asking user X for coordinates
         rx :
         
-        cout <<"\nEnter the coordinates where you want to Enter X : ";
+        cout <<"\nEnter the coordinates where you want to Enter X : " << endl;
         cin >> i >> j;
         //validating coordinates
         if( _board.empty(i, j) && i < row && j < column)
@@ -51,35 +51,60 @@ int main() {
         // Showing player's move
         _board.printBoard();
         
-        //Record time of bot move
         time_t start, end;
-
+        
         time(&start);
-
+        
         // AI's turn
         e.updateBoard(_board);
-        e.updateStartTime(start);
         Move bestMove = e.findBestMove();
-
+        
         // Play AI's move
         _board.makemove(bestMove.getI(), bestMove.getJ(), 1);
         _board.printBoard();
+
+        // print hash tree out
         
-        cout << e.getcnt() << endl; 
+        std::array<TreeMoves, 3> vec = e.getTree(_board.getHash());
         
+        cout << vec.size() << endl;
+        for (int i = 0; i < vec.size(); i++)
+        {
+            cout << vec[i]._move.getI() << " ";
+        }
+        cout << endl;
+        for (int i = 0; i < vec.size(); i++)
+        {
+            cout << vec[i]._move.getJ() << " ";
+        }
+        cout << endl;
+        for (int i = 0; i < vec.size(); i++)
+        {
+            cout << vec[i].depth << " ";
+        }
+        cout << endl;
+        for (int i = 0; i < vec.size(); i++)
+        {
+            cout << vec[i].player << " ";
+        }
+        cout << endl;
+
+        
+        cout << e.getcnt() << endl;
+
         time(&end);
 
-        cout << (double) end - start << setprecision(5) << "sec" << endl;
-        
+        cout << (double) (end - start) << setprecision(5) << "sec" << endl;
+
         //checking win
-        win = _board.win();
-        if(win == -10)
-        {
-            cout<<"Player with X char won!!";
-            break;
-        }
-        
-        cout << endl;
+//        win = _board.win();
+//        if(win == -10)
+//        {
+//            cout<<"Player with X char won!!";
+//            break;
+//        }
+//
+//        cout << endl;
         
 //        ro:
 //        cout <<"\nEnter the coordinates where you want to Enter O : ";

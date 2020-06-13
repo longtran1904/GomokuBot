@@ -11,21 +11,25 @@
 #include "iostream"
 #include "algorithm"
 #include "chrono"
+#include<map>
+
 
 Evaluator::Evaluator()
 {
     cnt = 0;
-    currentHash = 0;
 }
 
 void Evaluator::updateBoard(Board board)
 {
     _Board = board;
+    updateStartTime();
 }
 
-void Evaluator::updateStartTime(time_t time)
+void Evaluator::updateStartTime()
 {
-    t_start = time;
+    time_t start;
+    time(&start);
+    t_start = start;
 }
 
 Move Evaluator::findBestMove()
@@ -38,6 +42,9 @@ Move Evaluator::findBestMove()
     
     std::vector<Move> moveArray = _Board.getPossibleMoves();
     
+    std::array<TreeMoves, maxdepth> sequence;
+    int count_seq = 0;
+    
     for (Move m : moveArray)
     {
         if (_Board.empty(m.getI(), m.getJ()))
@@ -45,9 +52,26 @@ Move Evaluator::findBestMove()
             // Make move at i j
             _Board.makemove(m.getI(), m.getJ(), 1);
             
+            std::array<TreeMoves, maxdepth> subsequence;
+            int count_sub = 0;
             // Find value of this move
-            int moveVal = minimax(0, false, -1000, 1000);
-            //std::cout << moveVal << std::endl;
+            int moveVal = minimax(1, false, -1000, 1000, subsequence, count_sub);
+            
+            // Get TreeMoves value
+            TreeMoves tree;
+            tree._move = m;
+            tree.depth = 0;
+            tree.player = 'O';
+                        
+            //Transfer value from sub to sequence
+            count_seq = count_sub;
+//            for (int i = 0; i < count_seq; i++)
+//                sequence[i] = subsequence[i];
+//            sequence[++count_seq] = tree;
+            
+            // Store TreeMoves from minimax to table
+            //table.insert(std::pair<unsigned long long, TreeMoves[]>(_Board.getHash(), sequence));
+            table[_Board.getHash()] = sequence;
             
             // Remove move
             _Board.makemove(m.getI(), m.getJ(), 0);
@@ -60,6 +84,29 @@ Move Evaluator::findBestMove()
                 bestVal = moveVal;
             }
         }
+//        std::vector<TreeMoves> vec = getTree(_Board.getHash());
+//        std::cout << vec.size() << std::endl;
+//        for (int i = 0; i < vec.size(); i++)
+//        {
+//            std::cout << vec[i]._move.getI() << " ";
+//        }
+//        std::cout << std::endl;
+//        for (int i = 0; i < vec.size(); i++)
+//        {
+//            std::cout << vec[i]._move.getJ() << " ";
+//        }
+//        std::cout << std::endl;
+//        for (int i = 0; i < vec.size(); i++)
+//        {
+//            std::cout << vec[i].depth << " ";
+//        }
+//        std::cout << std::endl;
+//        for (int i = 0; i < vec.size(); i++)
+//        {
+//            std::cout << vec[i].player << " ";
+//        }
+//        std::cout << std::endl;
+        count_seq = 0;
     }
     
     return bestMove;
@@ -80,7 +127,7 @@ bool Evaluator::isCutOff(int depth, int AI, int human) const
     if ((double) (end-t_start) >= 5)
         return true;
     
-    if (depth == 2)
+    if (depth == 3)
         return true;
     if (!_Board.isMoveLeft())
         return true;
@@ -89,7 +136,7 @@ bool Evaluator::isCutOff(int depth, int AI, int human) const
     return false;
 }
 
-int Evaluator::minimax(int depth, bool isMaxing, int alpha, int beta)
+int Evaluator::minimax(int depth, bool isMaxing, int alpha, int beta, std::array<TreeMoves, maxdepth>& sequence, int& count_seq)
 {
 
     int AI = GiveScore(_Board, 1).GiveTotalScore();
@@ -101,29 +148,50 @@ int Evaluator::minimax(int depth, bool isMaxing, int alpha, int beta)
         return evaluateStateScore(AI, human);
     
     if (isMaxing)
-        return maxing(depth, isMaxing, alpha, beta);
+        return maxing(depth, isMaxing, alpha, beta, sequence, count_seq);
     else
-        return minizing(depth, isMaxing, alpha, beta);
+        return minizing(depth, isMaxing, alpha, beta, sequence, count_seq);
     
 }
 
 
-int Evaluator::maxing(int depth, bool isMaxing, int alpha, int beta)
+int Evaluator::maxing(int depth, bool isMaxing, int alpha, int beta, std::array<TreeMoves, maxdepth>& sequence, int& count_seq)
 {
     int bestVal = -1000;
+    Move bestMove;
+    bestMove.setI(-1);
+    bestMove.setJ(-1);
+
+    
     
     // Moves to consider to take in this game state
     std::vector<Move> moveArray = _Board.getPossibleMoves();
-    
+
     for (Move m : moveArray)
     {
         cnt++;
         if ((_Board.value(m.getI(), m.getJ())) == '_')
             {
+                
                 // Make a move at m.i & m.j
                 _Board.makemove(m.getI(), m.getJ(), 1);
+
+                std::array<TreeMoves, maxdepth> subsequence;
                 
-                bestVal = std::max(bestVal,minimax(depth+1, false, alpha, beta));
+                int count_sub = 0;
+                
+                int evaluate = minimax(depth+1, false, alpha, beta, subsequence, count_sub);
+                
+                if (bestVal < evaluate)
+                {
+                    bestVal = evaluate;
+                    bestMove = m;
+                    // update sequence to be subquence of better moves
+                    count_seq = count_sub;
+//                    for (int i = 0; i < count_sub; i++)
+//                        sequence[i] = subsequence[i];
+                }
+                
                 alpha = std::max(alpha, bestVal);
                 
                 // Remove that move
@@ -131,28 +199,67 @@ int Evaluator::maxing(int depth, bool isMaxing, int alpha, int beta)
                 
                 // alpha beta pruning
                 if (beta <= alpha)
+                {
+//                    // insert bestmove to sequence
+//
+//                    TreeMoves tree;
+//                    tree._move = bestMove;
+//                    tree.depth = depth;
+//                    tree.player = 'O';
+//
+//                    sequence.push_back(tree);
+
                     return bestVal;
+                }
             }
     }
+    
+    // insert bestmove to sequence
+    
+    TreeMoves tree;
+    tree._move = bestMove;
+    tree.depth = depth;
+    tree.player = 'O';
+    
+    sequence[++count_seq] = tree;
+
     return bestVal;
 }
 
-int Evaluator::minizing(int depth, bool isMaxing, int alpha, int beta)
+int Evaluator::minizing(int depth, bool isMaxing, int alpha, int beta, std::array<TreeMoves, maxdepth>& sequence, int& count_seq)
 {
     int bestVal = 1000;
+    Move bestMove;
+    bestMove.setI(-1);
+    bestMove.setJ(-1);
     
     // Moves to consider to take in this game state
     std::vector<Move> moveArray = _Board.getPossibleMoves();
-
+    
     for (Move m : moveArray)
     {
         cnt++;
         if (_Board.value(m.getI(), m.getJ()) == '_')
         {
+            
             // Make a move at m.i & m.j
             _Board.makemove(m.getI(), m.getJ(), 2);
-
-            bestVal = std::min(bestVal,minimax(depth+1, true, alpha, beta));
+            
+            std::array<TreeMoves, maxdepth> subsequence;
+            int count_sub = 0;
+            
+            int evaluate = minimax(depth+1, true, alpha, beta, subsequence, count_sub);
+            
+            if (bestVal > evaluate)
+            {
+                bestVal = evaluate;
+                bestMove = m;
+                // assign sequence to be subsequence of better moves
+                count_seq = count_sub;
+//                for (int i = 0; i < count_sub; i++)
+//                    sequence[i] = subsequence[i];
+            }
+            
             beta = std::min(beta,bestVal);
             
             // Remove the move
@@ -160,11 +267,34 @@ int Evaluator::minizing(int depth, bool isMaxing, int alpha, int beta)
             
             // Alpha beta pruning
             if (beta <= alpha)
+            {
+                // insert bestmove to sequence
+                
+//                if (bestMove.getI() != -1 && bestMove.getJ() != -1)
+//                {
+//                    TreeMoves tree;
+//                    tree._move = bestMove;
+//                    tree.depth = depth;
+//                    tree.player = 'O';
+//
+//                    sequence.push_back(tree);
+//                }
                 return bestVal;
+            }
         }
     }
+    
+    // insert move to sequence
+    if (bestMove.getI() != -1 && bestMove.getJ() != -1)
+    {
+        TreeMoves tree;
+        tree._move = bestMove;
+        tree.depth = depth;
+        tree.player = 'X';
+        
+        sequence[++count_seq] = tree;
+    }
     return bestVal;
-
 }
 
 
@@ -207,7 +337,16 @@ int Evaluator::checkwinner() const
     return 0;
 }
 
-
+std::array<TreeMoves, maxdepth> Evaluator::getTree(unsigned long long hash)
+{
+    std::array<TreeMoves, maxdepth> empty;
+    std::map<unsigned long long, std::array<TreeMoves, maxdepth>>::iterator it;
+    it = table.find(hash);
+    if (it != table.end())
+        return it->second;
+    return empty;
+    
+}
 
 
 std::vector<Piece> Evaluator::getMoveList() const

@@ -37,9 +37,9 @@
             filePath = "GomokuBot/evaluator.cpp"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "145"
-            endingLineNumber = "145"
-            landmarkName = "Evaluator::minizing(depth, isMaxing, alpha, beta)"
+            startingLineNumber = "237"
+            endingLineNumber = "237"
+            landmarkName = "Evaluator::minizing(depth, isMaxing, alpha, beta, sequence, count_seq)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -53,9 +53,9 @@
             filePath = "GomokuBot/evaluator.cpp"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "96"
-            endingLineNumber = "96"
-            landmarkName = "Evaluator::minimax(depth, isMaxing, alpha, beta)"
+            startingLineNumber = "143"
+            endingLineNumber = "143"
+            landmarkName = "Evaluator::minimax(depth, isMaxing, alpha, beta, sequence, count_seq)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

@@ -44,7 +44,7 @@ protected:
     int n,m;
     char** _Board;
     std::vector<Piece> move;
-    //HashTable currentState;
+    HashTable currentState;
 //    Player currentPlayer;
     char player = 'X';
     char AI = 'O';
@@ -55,7 +55,7 @@ public:
     void makemove(int i, int j, int color);
     void printBoard() const;
     bool empty(int i, int j) const;
-    int getHash(const int moduloR) const;
+    unsigned long long getHash() const;
     int win() const;
     void next_move() const;
     bool isMoveLeft() const;

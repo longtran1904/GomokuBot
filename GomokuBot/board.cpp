@@ -75,6 +75,10 @@ void Board::makemove(int i, int j, int color)
     // Storing moves played in the game
     Piece p(Move(i,j), c);
     move.push_back(p);
+    
+    //Recalculate current state hash
+    currentState.changeHash(i, j, _Board[i][j]);
+    
 }
 void Board::printBoard() const
 {
@@ -86,38 +90,44 @@ void Board::printBoard() const
     }
     cout << endl;
 }
-int powerOf3(int exp, int moduloR)
+
+unsigned long long Board::getHash() const
 {
-    if (exp <= 0) return 1;
-    if (exp == 1) return 3;
-    int tmp = powerOf3(exp >> 1, moduloR);
-    tmp = 1LL * tmp * tmp % moduloR;
-    return (exp & 1) ? (1LL * tmp * 3 % moduloR) : tmp;
+    return currentState.getHash();
 }
-int Board::getHash(const int moduloR = 1000000007) const
-{
-    // find first existing position
-    int min_i = INT_MAX, min_j = INT_MAX,
-        max_i = INT_MIN, max_j = INT_MIN;
-    
-    //
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < m; j++)
-            if (_Board[i][j] != 0)
-            {
-                min_i = Min(min_i, i);
-                min_j = Min(min_j, j);
-                max_i = Max(max_i, i);
-                max_j = Max(max_j, j);
-            }
-        
-    int hashC = 0;
-    for (int i = min_i; i <= max_i; i++)
-        for (int j = min_j; j <= max_j; j++)
-            hashC = (1LL * (_Board[i][j] + 1) * powerOf3(pathFunc(i - min_i, j - min_j), moduloR) + hashC) % moduloR;
-    return hashC;
-    
-}
+
+//int powerOf3(int exp, int moduloR)
+//{
+//    if (exp <= 0) return 1;
+//    if (exp == 1) return 3;
+//    int tmp = powerOf3(exp >> 1, moduloR);
+//    tmp = 1LL * tmp * tmp % moduloR;
+//    return (exp & 1) ? (1LL * tmp * 3 % moduloR) : tmp;
+//}
+//int Board::getHash(const int moduloR = 1000000007) const
+//{
+//    // find first existing position
+//    int min_i = INT_MAX, min_j = INT_MAX,
+//        max_i = INT_MIN, max_j = INT_MIN;
+//
+//    //
+//    for (int i = 0; i < n; i++)
+//        for (int j = 0; j < m; j++)
+//            if (_Board[i][j] != 0)
+//            {
+//                min_i = Min(min_i, i);
+//                min_j = Min(min_j, j);
+//                max_i = Max(max_i, i);
+//                max_j = Max(max_j, j);
+//            }
+//
+//    int hashC = 0;
+//    for (int i = min_i; i <= max_i; i++)
+//        for (int j = min_j; j <= max_j; j++)
+//            hashC = (1LL * (_Board[i][j] + 1) * powerOf3(pathFunc(i - min_i, j - min_j), moduloR) + hashC) % moduloR;
+//    return hashC;
+//
+//}
 
 bool Board::empty(int i, int j) const
 {
